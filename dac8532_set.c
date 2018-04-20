@@ -31,8 +31,6 @@ RPI_V2_GPIO_P1_13->RPI_GPIO_P1_13
 #include <bcm2835.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
 #include <math.h>
 #include <errno.h>
 
@@ -59,7 +57,7 @@ RPI_V2_GPIO_P1_13->RPI_GPIO_P1_13
 
 void  bsp_DelayUS(uint64_t micros);
 void Write_DAC8532(uint8_t channel, uint16_t Data);
-uint16_t Voltage_Convert(float Vref, float voltage);
+uint16_t Voltage_Convert(float voltage);
 
 
 void  bsp_DelayUS(uint64_t micros){
@@ -88,26 +86,26 @@ uint16_t Voltage_Convert(float voltage){
 int  main(int argc, char **argv){
   // process and sanitize inputs
   if (argc != 3){
-    printf("Expecting 2 arguments: channel voltage");
+    printf("Expecting 2 arguments: channel voltage\n");
     return 1;
   }
   errno = 0;  // catch errors, from errno.h
-  int channel = strtol(argv[1]);
+  int channel = atoi(argv[1]);
   if (errno != 0){
-    printf("errno %d encoutered converting %s to `int`", errno, argv[1]);
+    printf("errno %d encoutered converting %s to `int`\n", errno, argv[1]);
     return 1;
   }
-  float voltage = argv[2];
+  float voltage = atof(argv[2]);
   if (errno != 0){
-    printf("errno %d encoutered converting %s to `float`", errno, argv[2]);
+    printf("errno %d encoutered converting %s to `float`\n", errno, argv[2]);
     return 1;
   }
   if (channel < 0 || channel > MAX_CHANNEL-1){
-    printf("channel designation: `%d` exceeds MAX_CHANNEL spec: `%d`.", channel, MAX_CHANNEL);
+    printf("channel designation: `%d` exceeds MAX_CHANNEL spec: `%d`.\n", channel, MAX_CHANNEL);
     return 1;
   }
   if (voltage < 0 || voltage > MAX_V){
-    printf("voltage designation: `%f` exceeds MAX_VOLTAGE spec: `%f`.", voltage, MAX_V);
+    printf("voltage designation: `%f` exceeds MAX_VOLTAGE spec: `%f`.\n", voltage, MAX_V);
     return 1;
   }
 
@@ -124,7 +122,7 @@ int  main(int argc, char **argv){
 
   //Write channel buffer
   Write_DAC8532(
-    {CHANNEL_0, CHANNEL_1}[channel],
+    ((char[]){CHANNEL_0, CHANNEL_1})[channel],
     Voltage_Convert(voltage)
   );
 
