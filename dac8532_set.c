@@ -50,7 +50,9 @@ RPI_V2_GPIO_P1_13->RPI_GPIO_P1_13
 #define uint16_t unsigned short
 
 #define VREF        5.0   // voltage ref used
-#define MAX_V       VREF  // output cannot exceed vref, change if lower value is necessary
+#define DAC_BITS    16    // 16b DAC word
+// output cannot exceed vref (2**16- 1b)/2**16, change if lower value is necessary
+#define MAX_V       VREF-1.0/(1<<(DAC_BITS-1))
 #define MAX_CHANNEL 2     // 2 DAC channels
 #define CHANNEL_0   0x30  // dac0, ch A
 #define CHANNEL_1   0x34  // dac1, ch B
@@ -104,9 +106,12 @@ int  main(int argc, char **argv){
     printf("channel designation: `%d` exceeds MAX_CHANNEL spec: `%d`.\n", channel, MAX_CHANNEL);
     return 1;
   }
-  if (voltage < 0 || voltage > MAX_V){
+  if (voltage > MAX_V){
     printf("voltage designation: `%f` exceeds MAX_VOLTAGE spec: `%f`.\n", voltage, MAX_V);
-    return 1;
+    voltage = MAX_V;
+  } else if (voltage < 0){
+    printf("voltage designation: `%f` exceeds MIN_VOLTAGE spec: `%f`.\n", voltage, 0);
+    voltage = 0;
   }
 
   // set up the spi
