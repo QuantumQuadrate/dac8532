@@ -52,7 +52,7 @@ RPI_V2_GPIO_P1_13->RPI_GPIO_P1_13
 #define VREF        5.0   // voltage ref used
 #define DAC_BITS    16    // 16b DAC word
 // output cannot exceed vref (2**16- 1b)/2**16, change if lower value is necessary
-#define MAX_V       VREF-1.0/(1<<(DAC_BITS-1))
+#define MAX_V       VREF-VREF/(1<<(DAC_BITS-1))
 #define MAX_CHANNEL 2     // 2 DAC channels
 #define CHANNEL_0   0x30  // dac0, ch A
 #define CHANNEL_1   0x34  // dac1, ch B
